@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="jquery.bxslider.css"/>
+		<style type="text/css">
+			*{margin: 0;padding: 0;}
+			li{
+				list-style: none;
+			}
+			.box{
+				width: 100%;
+				height: 500px;
+			}
+			.box li {
+				width: 100%;
+				height: 500px;
+				background: lightblue;
+				text-align: center;
+				line-height: 500px;
+				font-size: 40px;
+				color: #000000;
+			}
+			.box1{
+				float: right;
+				height: 50px;
+				display: none;
+			}
+			.box1 li{
+				background:lightseagreen;
+				text-align: center;
+				line-height: 50px;
+				float: left;
+				border: 3px solid #FFFFFF;
+			}
+			.box1 .hover{
+				border: 3px solid #F59C00;
+			}
+			button{
+				width: 50px;
+				height: 50px;
+				border: 3px solid red;
+				background: #2C3E50;
+				text-align: center;
+				line-height: 50px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<ul class="bxslider">
+				<li>0001</li>
+				<li>0002</li>
+				<li>0003</li>
+				<li>0004</li>
+				<li>0005</li>
+				<li>0006</li>
+				<li>0007</li>
+				<li>0008</li>
+				<li>0009</li>
+				<li>0010</li>
+			</ul>
+		</div>
+		<button>click</button>
+		<div class="box1">
+			<div class="left" style="float: left;width: 50px;background: lightcoral;height: 50px;">left</div>
+			<div class="ulwrapper" style="position:relative;height: 56px;float:left;overflow: hidden;">
+				<ul class="ul"style="position:absolute;left: 0;">
+					<li class="hover">01</li>
+					<li>02</li>
+					<li>03</li>
+					<li>04</li>
+					<li>05</li>
+					<li>06</li>
+					<li>07</li>
+					<li>08</li>
+					<li>09</li>
+					<li>10</li>
+				</ul>
+			</div>
+			<div class="right" style="float:left;width: 50px;background: lightcoral;height: 50px;">right</div>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="jquery.bxslider.min.js"></script>
+	</body>
+</html>
+<script type="text/javascript">
+var slider = $('.box .bxslider').bxSlider({
+	mode: 'horizontal',   //移动方向 
+	moveSlides: 1,        //每次移动的数量
+	slideMargin: 0,      //slider间距
+	infiniteLoop: false,   //loop
+	minSlides: 1,         //控制页面显示slider最小数量  
+	maxSlides: 1,         //控制页面显示slider最大数量
+	moveSlides:1,         //每次移动的slider数量
+	controls: true,
+	pager: false,
+	speed: 200,          //控制转换时间
+	onSlideBefore:function($slideElement, oldIndex, newIndex){
+		num = Math.floor( newIndex/4 );
+		go(num);
+		console.log(num)
+		$(".box1 ul li").eq( newIndex ).addClass("hover").siblings().removeClass("hover");
+	}
+});
+//$(function(){
+	$(".box1 .ul li").css({"width":"94px","float":"left"});
+	var boxWidth = 4*$(".box1 .ul li").outerWidth();
+	var ulWidth = $(".box1 .ul li").length*$(".box1 .ul li").outerWidth();
+	$(".ulwrapper").css({"width":boxWidth,"overflew":"hidden"});
+	$(".ul").css({"width":ulWidth})
+	
+	var num = 0;
+	$(".left").click(function(){
+		num > 0 ? num-- : num = 0;
+		var count = slider.getSlideCount();//总数
+		go(num)
+//		if( slider.getCurrentSlide() <= count%4 ){
+//			$(".ulwrapper ul").animate({"left":"-"+ 100*(count%4) +""},500);
+//		}else{
+//			$(".ulwrapper ul").animate({"left":"-"+ boxWidth*num +""},500);			
+//		}
+//		console.log(num+"left")
+	})
+	
+	$(".right").click(function(){
+		num < Math.floor( slider.getSlideCount()/4 ) ? num++ : num = Math.floor( slider.getSlideCount()/4 );
+		go(num)
+	})
+	
+	function go(num){
+		var count = slider.getSlideCount();//总数
+		if( num == Math.floor( slider.getSlideCount()/4 ) ){
+			$(".ulwrapper ul").animate({"left":"-"+ (boxWidth*(num-1)+100*(count%4)) +""},500);
+		}else{
+			$(".ulwrapper ul").animate({"left":"-"+ boxWidth*num +""},500);			
+		}
+	}
+	
+
+var flag = false;
+$("button").click(function(){
+	flag = !flag;
+	if( flag ){
+		$(".box1").fadeIn();
+	}else{
+		$(".box1").fadeOut();
+	}
+})
+</script>
