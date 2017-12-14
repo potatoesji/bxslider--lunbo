@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title></title>
+		<title>轮播图--双向控制</title>
 		<link rel="stylesheet" type="text/css" href="jquery.bxslider.css"/>
 		<style type="text/css">
 			*{margin: 0;padding: 0;}
@@ -45,6 +45,25 @@
 				text-align: center;
 				line-height: 50px;
 			}
+			.left,.right{
+				float: left;
+				width: 56px;
+				background: lightcoral;
+				height: 56px;
+				border-radius:50%;
+				text-align:center;
+				line-height:56px
+			}
+			.ulwrapper{
+				position:relative;
+				height: 56px;
+				float:left;
+				overflow: hidden;
+			}
+			.ul{
+				position:absolute;
+				left: 0;	
+			}
 		</style>
 	</head>
 	<body>
@@ -64,9 +83,9 @@
 		</div>
 		<button>click</button>
 		<div class="box1">
-			<div class="left" style="float: left;width: 50px;background: lightcoral;height: 50px;">left</div>
-			<div class="ulwrapper" style="position:relative;height: 56px;float:left;overflow: hidden;">
-				<ul class="ul"style="position:absolute;left: 0;">
+			<div class="left" style="">left</div>
+			<div class="ulwrapper">
+				<ul class="ul">
 					<li class="hover">01</li>
 					<li>02</li>
 					<li>03</li>
@@ -79,73 +98,96 @@
 					<li>10</li>
 				</ul>
 			</div>
-			<div class="right" style="float:left;width: 50px;background: lightcoral;height: 50px;">right</div>
+			<div class="right">right</div>
 		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="jquery.bxslider.min.js"></script>
 	</body>
 </html>
 <script type="text/javascript">
-var slider = $('.box .bxslider').bxSlider({
-	mode: 'horizontal',   //移动方向 
-	moveSlides: 1,        //每次移动的数量
-	slideMargin: 0,      //slider间距
-	infiniteLoop: false,   //loop
-	minSlides: 1,         //控制页面显示slider最小数量  
-	maxSlides: 1,         //控制页面显示slider最大数量
-	moveSlides:1,         //每次移动的slider数量
-	controls: true,
-	pager: false,
-	speed: 200,          //控制转换时间
-	onSlideBefore:function($slideElement, oldIndex, newIndex){
-		num = Math.floor( newIndex/4 );
-		go(num);
-		console.log(num)
-		$(".box1 ul li").eq( newIndex ).addClass("hover").siblings().removeClass("hover");
-	}
-});
-//$(function(){
-	$(".box1 .ul li").css({"width":"94px","float":"left"});
-	var boxWidth = 4*$(".box1 .ul li").outerWidth();
-	var ulWidth = $(".box1 .ul li").length*$(".box1 .ul li").outerWidth();
-	$(".ulwrapper").css({"width":boxWidth,"overflew":"hidden"});
-	$(".ul").css({"width":ulWidth})
-	
-	var num = 0;
-	$(".left").click(function(){
-		num > 0 ? num-- : num = 0;
-		var count = slider.getSlideCount();//总数
-		go(num)
-//		if( slider.getCurrentSlide() <= count%4 ){
-//			$(".ulwrapper ul").animate({"left":"-"+ 100*(count%4) +""},500);
-//		}else{
-//			$(".ulwrapper ul").animate({"left":"-"+ boxWidth*num +""},500);			
-//		}
-//		console.log(num+"left")
-	})
-	
-	$(".right").click(function(){
-		num < Math.floor( slider.getSlideCount()/4 ) ? num++ : num = Math.floor( slider.getSlideCount()/4 );
-		go(num)
-	})
-	
-	function go(num){
-		var count = slider.getSlideCount();//总数
-		if( num == Math.floor( slider.getSlideCount()/4 ) ){
-			$(".ulwrapper ul").animate({"left":"-"+ (boxWidth*(num-1)+100*(count%4)) +""},500);
-		}else{
-			$(".ulwrapper ul").animate({"left":"-"+ boxWidth*num +""},500);			
-		}
-	}
-	
 
-var flag = false;
-$("button").click(function(){
-	flag = !flag;
-	if( flag ){
-		$(".box1").fadeIn();
-	}else{
-		$(".box1").fadeOut();
+	function Page(){
+		this.left = $(".left");
+		this.right = $(".right");
+		this.button = $("button");
+		this.box1 = $(".box1");
+		this.li = $("ul li");
+		this.num = 0;
+		this.flag = false;
 	}
-})
+	$.extend(Page.prototype, {
+		init(){
+			this.initDom();
+			this.bindEvent();
+		},
+
+		initDom(){
+			$(".box1 .ul li").css({"width":"94px","float":"left"});
+			this.boxWidth = 4*$(".box1 .ul li").outerWidth();
+			this.ulWidth = $(".box1 .ul li").length*$(".box1 .ul li").outerWidth();
+			$(".ulwrapper").css({"width":this.boxWidth,"overflew":"hidden"});
+			$(".ul").css({"width":this.ulWidth})
+		},
+
+		bindEvent(){
+			this.left.on("click", $.proxy( this.handleLeftBtnClick ,this))
+			this.right.on("click", $.proxy( this.handleRightBtnClick ,this))
+			this.button.on("click", $.proxy( this.handleButtonClick ,this))
+			for (let index = 0; index < this.li.length; index++) {
+				this.li.eq(index).on("click", $.proxy( this.handleLiClick ,this,index));
+			}
+		},
+		handleLiClick(index){
+			this.li.eq(index).addClass("hover").siblings().removeClass("hover");
+			slider.goToSlide(index);
+		},
+		handleButtonClick(){
+			this.flag = !this.flag;
+			if( this.flag ){
+				this.box1.fadeIn();
+			}else{
+				this.box1.fadeOut();
+			}
+		},
+
+		handleLeftBtnClick(){
+			this.num > 0 ? this.num-- : this.num = 0;
+			this.handleSmallMove(this.num)
+		},
+
+		handleRightBtnClick(){
+			this.num < Math.floor( slider.getSlideCount()/4 ) ? this.num++ : this.num = Math.floor( slider.getSlideCount()/4 );
+			this.handleSmallMove(this.num)
+		},
+
+		handleSmallMove(num){
+			var count = slider.getSlideCount();//总数
+			if( num == Math.floor( slider.getSlideCount()/4 ) ){
+				$(".ulwrapper ul").animate({"left":"-"+ (this.boxWidth*(num-1)+100*(count%4)) +""},500);
+			}else{
+				$(".ulwrapper ul").animate({"left":"-"+ this.boxWidth*num +""},500);			
+			}
+		}
+	})
+	var page = new Page();
+	page.init();
+
+	var slider = $('.box .bxslider').bxSlider({
+		mode: 'horizontal',   //移动方向 
+		moveSlides: 1,        //每次移动的数量
+		slideMargin: 0,       //slider间距
+		infiniteLoop: false,  //loop
+		minSlides: 1,         //控制页面显示slider最小数量  
+		maxSlides: 1,         //控制页面显示slider最大数量
+		moveSlides:1,         //每次移动的slider数量
+		controls: true,       //创建左右按钮
+		pager: false,         //创建分页
+		speed: 500,           //控制转换时间
+		onSlideBefore:function($slideElement, oldIndex, newIndex){
+			num = Math.floor( newIndex/4 );
+			page.handleSmallMove(num);
+			$(".box1 ul li").eq( newIndex ).addClass("hover").siblings().removeClass("hover");
+		}
+	});
+
 </script>
