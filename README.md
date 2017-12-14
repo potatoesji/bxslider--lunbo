@@ -1,8 +1,8 @@
 #[bxslider--lunbo官方网站](https://bxslider.com/options/ "https://bxslider.com/options/")--------[git地址](https://github.com/stevenwanderski/bxslider-4 "https://github.com/stevenwanderski/bxslider-4")
 
-##bxslider插件---双向控制轮播图
+#bxslider插件---双向控制轮播图
 
-bxslider插件 
+##bxslider插件 
    左右按钮切换  --点击左右按钮时 没有限制 造成连续点击时 会一下滚动好几张图片的现象
 
    `解决方案：等上一次运动完成后再执行左右按钮的点击`
